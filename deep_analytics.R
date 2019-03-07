@@ -318,3 +318,30 @@ ggplot(test9) +
         legend.key = element_rect(colour = "#05afff",fill = "black")) +
   ggtitle("Tuesday 23/09/2008 Energy Consumption")
 
+test10 <- energy %>% group_by(Date) %>% summarise(G.i.mean = mean(G.i, na.rm = T),
+                                                  Voltage.mean = mean(Voltage, na.rm = T),
+                                                  G.a.p.mean = mean(G.a.p, na.rm = T),
+                                                  G.r.p.mean = mean(G.r.p, na.rm = T))
+ggplot(test10) +
+  geom_point(aes(x = Date, y = G.i.mean, color = "G.i.mean")) +
+  geom_point(aes(x = Date, y = Voltage.mean, color = "Voltage.mean")) +
+  geom_point(aes(x = Date, y = G.a.p.mean, color = "G.a.p.mean")) +
+  geom_point(aes(x = Date, y = G.r.p.mean, color = "G.r.p.mean")) +
+  scale_x_date(date_breaks = "1 month") +
+  theme(plot.background = element_rect(fill = "black"),
+        panel.background = element_rect(fill = "black"),
+        panel.grid.major = element_line(size = 0.1, linetype = 'dotted',
+                                        colour = "light blue"), 
+        panel.grid.minor = element_line(size = 0.1, linetype = 'dotted',
+                                        colour = "light blue"),
+        panel.border = element_blank(),
+        axis.text = element_text(size = rel(1), colour = "#05afff"),
+        axis.title.x = element_text(colour = "#05afff"),
+        axis.title.y = element_blank(),
+        plot.title = element_text(color = "#05afff", face = "bold", hjust = .5),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.background = element_rect(fill = "black"),
+        legend.text = element_text(colour = "#05afff"),
+        legend.key = element_rect(colour = "#05afff",fill = "black"),
+        legend.key = element) +
+  ggtitle("Anual Measurements")
