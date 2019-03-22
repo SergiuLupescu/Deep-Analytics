@@ -6,6 +6,7 @@ library(corrplot)
 library(visdat)
 library(forecast)
 library(zoo)
+library(imputeTS)
 
 # load dataset.
 energy <- read_delim("household_power_consumption.txt", 
@@ -102,7 +103,7 @@ ggplot(test3) +
   ggtitle("")
 
 
-#### time series spike ####
+#### time series spike notes ####
 # my_ts <- ts(df, frequency = number of records in one year)
 
 # Stationarity:
@@ -155,6 +156,14 @@ ggplot(test3) +
 
 #### grouping for time series ####
 
+na.approx(energy$Gap)
+na.approx(energy$Grp)
+na.approx(energy$Gi)
+na.approx(energy$Sub1)
+na.approx(energy$Sub2)
+na.approx(energy$Sub3)
+na.approx(energy$Sub4)
+# na.ma is another option from imputeTS package.
 energy_month <- energy %>% group_by(year(Date), month(Date)) %>% filter(year(Date) != 2006) %>% 
                            summarise(GAP = sum(Gap, na.rm = TRUE),
                                      GRP = sum(Grp, na.rm = TRUE),
@@ -167,22 +176,108 @@ energy_month <- energy %>% group_by(year(Date), month(Date)) %>% filter(year(Dat
 ts_energy <- ts(energy_month, start = c(2007,1), end = c(2010,11), frequency = 12)
 
 #### ts_energy plots ####
-autoplot(ts_energy)
+autoplot(ts_energy[ ,"GAP"])
+autoplot(ts_energy[ ,"GRP"])
+autoplot(ts_energy[ ,"GI"])
+autoplot(ts_energy[ ,"SUB1"])
+autoplot(ts_energy[ ,"SUB2"])
+autoplot(ts_energy[ ,"SUB3"])
+autoplot(ts_energy[ ,"SUB4"])
 autoplot(stl(ts_energy[ ,"GAP"], s.window = "periodic"))
 
 #### ts_energy train and test ####
 ts_train <- window(ts_energy, start = c(2007,1), end = c(2009,12))
 ts_test <- window(ts_energy, start = c(2010,1), end = c(2010,11))
 
-#### tslm dataframe ####
-ts_train_df <- data.frame(ts_train[ ,"GAP"], as.numeric(time(ts_train)))
-names(ts_train_df) <- c("GAP", "Time")
+plot(decompose(ts_train[ ,"GAP"]))
 
+#### tslm dataframe ####
+ts_train_GAP <- data.frame(ts_train[ ,"GAP"], as.numeric(time(ts_train)))
+ts_train_GRP <- data.frame(ts_train[ ,"GRP"], as.numeric(time(ts_train)))
+ts_train_GI <- data.frame(ts_train[ ,"GI"], as.numeric(time(ts_train)))
+ts_train_SUB1 <- data.frame(ts_train[ ,"SUB1"], as.numeric(time(ts_train)))
+ts_train_SUB2 <- data.frame(ts_train[ ,"SUB2"], as.numeric(time(ts_train)))
+ts_train_SUB3 <- data.frame(ts_train[ ,"SUB3"], as.numeric(time(ts_train)))
+ts_train_SUB4 <- data.frame(ts_train[ ,"SUB4"], as.numeric(time(ts_train)))
+names(ts_train_GAP) <- c("GAP", "Time")
+names(ts_train_GRP) <- c("GRP", "Time")
+names(ts_train_GI) <- c("GI", "Time")
+names(ts_train_SUB1) <- c("SUB1", "Time")
+names(ts_train_SUB2) <- c("SUB2", "Time")
+names(ts_train_SUB3) <- c("SUB3", "Time")
+names(ts_train_SUB4) <- c("SUB4", "Time")
 #### tslm model and forecast ####
-mod_tslm <- tslm(GAP ~ season + trend, ts_train_df)
-fc_tslm <- forecast(mod_tslm, h = 11)
-autoplot(fc_tslm)
-plot(fc_tslm, col = "red")
+# GAP model.
+mod_tslm_GAP <- tslm(GAP ~ season + trend, ts_train_GAP)
+fc_tslm_GAP <- forecast(mod_tslm_GAP, h = 11)
+autoplot(fc_tslm_GAP)
+plot(fc_tslm_GAP, col = "red")
+lines(ts_test[ ,"GAP"], col = "black", lwd = 2)
+
+#GRP model.
+mod_tslm_GRP <- tslm(GRP ~ season + trend, ts_train_GRP)
+fc_tslm_GRP <- forecast(mod_tslm_GRP, h = 11)
+autoplot(fc_tslm_GRP)
+plot(fc_tslm_GRP, col = "red")
+lines(ts_test[ ,"GRP"], col = "black", lwd = 2)
+
+#GI model.
+mod_tslm_GI <- tslm(GI ~ season + trend, ts_train_GI)
+fc_tslm_GI <- forecast(mod_tslm_GI, h = 11)
+autoplot(fc_tslm_GI)
+plot(fc_tslm_GI, col = "red")
+lines(ts_test[ ,"GI"], col = "black", lwd = 2)
+
+#SUB1 model.
+mod_tslm_SUB1 <- tslm(SUB1 ~ season + trend, ts_train_SUB1)
+fc_tslm_SUB1 <- forecast(mod_tslm_SUB1, h = 11)
+autoplot(fc_tslm_SUB1)
+plot(fc_tslm_SUB1, col = "red")
+lines(ts_test[ ,"SUB1"], col = "black", lwd = 2)
+
+#SUB2 model.
+mod_tslm_SUB2 <- tslm(SUB2 ~ season + trend, ts_train_SUB2)
+fc_tslm_SUB2 <- forecast(mod_tslm_SUB2, h = 11)
+autoplot(fc_tslm_SUB2)
+plot(fc_tslm_SUB2, col = "red")
+lines(ts_test[ ,"SUB2"], col = "black", lwd = 2)
+
+#SUB3 model.
+mod_tslm_SUB3 <- tslm(SUB3 ~ season + trend, ts_train_SUB3)
+fc_tslm_SUB3 <- forecast(mod_tslm_SUB3, h = 11)
+autoplot(fc_tslm_SUB3)
+plot(fc_tslm_SUB3, col = "red")
+lines(ts_test[ ,"SUB3"], col = "black", lwd = 2)
+
+#SUB4 model.
+mod_tslm_SUB4 <- tslm(SUB4 ~ season + trend, ts_train_SUB4)
+fc_tslm_SUB4 <- forecast(mod_tslm_SUB4, h = 11)
+autoplot(fc_tslm_SUB4)
+plot(fc_tslm_SUB4, col = "red")
+lines(ts_test[ ,"SUB4"], col = "black", lwd = 2)
+
+#### ARIMA MODEL ###
+autoplot(ts_train[ ,"GAP"])
+plot(decompose(ts_train[ ,"GAP"]))
+ggAcf(ts_train[ ,"GAP"])
+ggPacf(ts_train[ ,"GAP"])
+
+mod_arima_GAP <- auto.arima(ts_train[ ,"GAP"], D = 1)
+fc_arima_GAP <- forecast(mod_arima_GAP, h = 11)
+
+summary(residuals(mod_tslm_GAP))
+checkresiduals(mod_tslm_GAP)
+
+autoplot(fc_arima_GAP)
+plot(fc_arima_GAP, col = "red")
+lines(ts_test[ ,"GAP"], col = "black", lwd = 2)
+
+#### HOLT WINTERS ####
+mod_hw_GAP <- hw(ts_train[ ,"GAP"], seasonal="additive")
+fc_hw_GAP <- forecast(mod_hw_GAP, h = 11)
+
+autoplot(fc_hw_GAP)
+plot(fc_hw_GAP, col = "red")
 lines(ts_test[ ,"GAP"], col = "black", lwd = 2)
 
 
@@ -190,16 +285,33 @@ lines(ts_test[ ,"GAP"], col = "black", lwd = 2)
 
 
 
-energyTime <- ts(na.interp(test1$Gap10), frequency = 12)
-View(energyTime)
-plot(decompose(energyTime))
+#### interesting code for plots ####
+# ggtsdisplay(energyTime)
+#
+# gap1 <- na.interp(energy$Gap)
+# autoplot(gap1, series = "Interpolated") +
+#   autolayer(ts(energy$Gap), series = "Original") +
+#   scale_colour_manual(values = c(`Interpolated` = "red", `Original` = "gray"))
+#
+# plot(energy$Gap ~ month(energy$time), type="l")
 
-ggtsdisplay(energyTime)
+#### code review notes####
+# 1 Fill NA
+# 2 Make groups
+# 3 Create TS
+# 4 Decompose
+# 5 TS split
+# 6 Train model
+# 7 Evaluate model
+# 8 Forecast
+#
+# ARIMA -> p = PACF, q = ACF
+# ts - decompose$seasonality
+# model_ts + decompose$seasonality
+#
+#
+#
+#
+#
+#
 
-gap1 <- na.interp(energy$Gap)
-autoplot(gap1, series="Interpolated") +
-  autolayer(ts(energy$Gap), series="Original") +
-  scale_colour_manual(
-    values=c(`Interpolated`="red",`Original`="gray"))
-
-plot(energy$Gap ~ month(energy$time), type="l")
